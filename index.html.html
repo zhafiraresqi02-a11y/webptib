@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLASSORA</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+  --primary:#4f46e5; --primary-d:#4338ca; --ok:#16a34a; --izin:#2563eb; --sakit:#d97706; --alpa:#dc2626;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text)}
+.hidden{display:none!important}
+.muted{color:var(--muted)} .tiny{font-size:.78rem} .center{text-align:center}
+h1,h2,h3{margin:0}
+h3{font-size:1.02rem}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;
+  background:linear-gradient(135deg,#4f46e5,#9333ea)}
+.login-card{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:380px;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:12px}
+.logo{font-size:3rem}
+.role-pick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.role input{display:none}
+.role span{display:flex;flex-direction:column;gap:2px;padding:14px 8px;border:2px solid var(--line);
+  border-radius:12px;cursor:pointer}
+.role small{color:var(--muted);font-size:.72rem}
+.role input:checked + span{border-color:var(--primary);background:#eef2ff}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:14px 18px;
+  display:flex;justify-content:space-between;align-items:center}
+.topbar small{opacity:.85}
+#app{max-width:860px;margin:0 auto;padding-bottom:40px}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin:14px;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:12px}
+
+/* konteks */
+.context{flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-top:-1px}
+.save-state{font-size:.8rem;color:var(--muted);margin-left:auto}
+.save-state.ok{color:var(--ok)} .save-state.warn{color:var(--sakit)}
+
+/* form */
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.78rem;color:var(--muted);font-weight:600}
+.grow{flex:1;min-width:140px}
+input[type=text],input[type=date],input[type=number],input[type=password],input[type=time],select,textarea{
+  padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+textarea{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem}
+.check{display:flex;align-items:center;gap:6px;font-size:.9rem;align-self:flex-end;padding-bottom:10px}
+details{border:1px dashed var(--line);border-radius:10px;padding:10px}
+details summary{cursor:pointer;color:var(--primary);font-weight:600}
+details textarea{margin:10px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* layout util */
+.row{display:flex;align-items:center}
+.between{justify-content:space-between}
+.gap{gap:8px}
+.wrap{flex-wrap:wrap}
+
+/* buttons */
+.btn{border:1.5px solid var(--line);background:#fff;padding:10px 16px;border-radius:10px;font:inherit;
+  font-weight:600;cursor:pointer}
+.btn:hover{background:#f3f4f6}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.primary:hover{background:var(--primary-d)}
+.btn.danger{color:var(--alpa);border-color:#fecaca}
+.btn.danger:hover{background:#fef2f2}
+.btn.ghost{background:transparent;color:inherit}
+.topbar .btn.ghost{border-color:rgba(255,255,255,.5);color:#fff}
+.btn.small{padding:6px 12px;font-size:.85rem}
+.btn.block{width:100%} .btn.big{padding:14px;font-size:1.1rem}
+
+/* tabs */
+.tabs{display:flex;gap:6px;padding:0 14px;overflow-x:auto}
+.tab{flex:1 0 auto;white-space:nowrap;border:none;background:#e9ecf8;padding:11px 14px;border-radius:12px;
+  font:inherit;font-weight:600;cursor:pointer;color:#4b5563}
+.tab.active{background:var(--primary);color:#fff}
+.subtabs{display:flex;gap:6px}
+.subtab{flex:1;border:1.5px solid var(--line);background:#fff;padding:9px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+.subtab.active{background:#eef2ff;border-color:var(--primary);color:var(--primary)}
+
+/* list */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.item .nm{font-weight:600} .item .nim{font-size:.78rem;color:var(--muted)}
+.badge{background:#eef2ff;color:var(--primary);padding:2px 9px;border-radius:99px;font-size:.8rem}
+.empty{text-align:center;color:var(--muted);padding:18px}
+
+/* status buttons */
+.st{display:flex;gap:4px}
+.st button{border:1.5px solid var(--line);background:#fff;border-radius:8px;width:38px;height:34px;
+  font-weight:700;cursor:pointer;color:var(--muted)}
+.st button.on[data-s=H]{background:var(--ok);border-color:var(--ok);color:#fff}
+.st button.on[data-s=I]{background:var(--izin);border-color:var(--izin);color:#fff}
+.st button.on[data-s=S]{background:var(--sakit);border-color:var(--sakit);color:#fff}
+.st button.on[data-s=A]{background:var(--alpa);border-color:var(--alpa);color:#fff}
+.counter{display:flex;gap:8px;flex-wrap:wrap;font-size:.82rem}
+.counter span{padding:3px 10px;border-radius:99px;background:#f3f4f6}
+
+/* roda spin */
+.wheel-wrap{position:relative;width:min(100%,340px);margin:6px auto 0}
+#wheel{width:100%;aspect-ratio:1;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.18))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
+  border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid #111827;
+  z-index:2;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+.spin-box{min-height:70px;display:grid;place-items:center;border-radius:14px;font-size:1.35rem;font-weight:800;
+  background:linear-gradient(135deg,#eef2ff,#fdf2f8);border:2px dashed #c7d2fe;text-align:center;padding:8px}
+.spin-box.spinning{animation:pulse .3s infinite alternate;color:var(--primary)}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.03)}}
+.spin-log{margin:0;padding-left:22px;font-size:.92rem;line-height:1.6}
+
+/* groups */
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.gcard{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;
+  animation:pop .35s ease both}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+.gcard input{font-weight:700}
+.gcard input.materi{font-weight:400;font-size:.88rem}
+.gcard ol{margin:0;padding-left:20px;font-size:.9rem;line-height:1.55}
+.ghead{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--muted)}
+.mrow{display:flex;align-items:center;gap:6px;justify-content:space-between;font-size:.9rem;padding:2px 0}
+.mrow .mname{flex:1;min-width:0;word-break:break-word}
+.mrow select{width:auto;padding:3px 4px;font-size:.78rem}
+.xbtn{border:none;background:#fee2e2;color:#991b1b;border-radius:99px;width:22px;height:22px;cursor:pointer;font-weight:700;line-height:1;flex:none}
+.gcard .addrow{display:flex;gap:6px}
+.gcard .addrow input{padding:7px 10px;font-size:.85rem;font-weight:400}
+.gcard.flash{animation:flashcard 1.4s ease}
+@keyframes flashcard{0%{box-shadow:0 0 0 0 rgba(79,70,229,.6);background:#eef2ff;transform:scale(1.04)}100%{box-shadow:0 0 0 14px rgba(79,70,229,0);background:#fff;transform:none}}
+
+/* kelompok tersimpan */
+.setbox{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.sgrp{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin:8px 0 2px}
+.sgrp .smembers{grid-column:1/-1;font-size:.82rem;color:var(--muted)}
+.sgrp input{font-size:.88rem;padding:7px 10px}
+
+/* sumber nama spin */
+.source-box{border:1.5px dashed #c7d2fe;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:#fafbff}
+.source-box .check{align-self:flex-start;padding-bottom:0}
+.check.sub{margin-left:24px}
+.pool-info{font-size:.85rem;color:var(--primary);font-weight:700}
+
+/* jadwal */
+.day-block{display:flex;flex-direction:column;gap:8px}
+.day-h{font-weight:800;color:var(--primary);margin-top:6px}
+.day-h.today{background:#eef2ff;border-radius:8px;padding:4px 10px}
+
+/* tugas */
+.tcard{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.tcard.done{opacity:.7}
+.tcard h4{margin:0;font-size:1rem}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.75rem;font-weight:700;background:#eef2ff;color:var(--primary)}
+.chip.warn{background:#fef3c7;color:#92400e}
+.chip.late{background:#fee2e2;color:#991b1b}
+.chip.ok{background:#dcfce7;color:#166534}
+.tdesc{white-space:pre-wrap;font-size:.92rem;line-height:1.5}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.media-grid img,.media-grid video{width:100%;height:130px;object-fit:cover;border-radius:10px;background:#111;cursor:zoom-in}
+.media-grid video{cursor:auto}
+.pending{display:flex;flex-wrap:wrap;gap:8px}
+.pfile{position:relative;width:96px;height:96px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#f3f4f6;display:grid;place-items:center;font-size:.7rem;text-align:center}
+.pfile img,.pfile video{width:100%;height:100%;object-fit:cover}
+.pfile button{position:absolute;top:2px;right:2px;border:none;background:rgba(0,0,0,.65);color:#fff;border-radius:99px;width:22px;height:22px;cursor:pointer}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:grid;place-items:center;z-index:200;padding:16px;cursor:zoom-out}
+#lightbox img{max-width:100%;max-height:100%;border-radius:8px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#111827;color:#fff;
+  padding:10px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;font-size:.9rem;z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* ===== ANIMASI TOMBOL ===== */
+.btn,.tab,.subtab,.st button,.role span{transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s,color .2s,border-color .2s}
+.btn:hover,.tab:hover,.subtab:hover,.st button:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(79,70,229,.25)}
+.btn:active,.tab:active,.subtab:active,.st button:active,.role span:active{transform:scale(.92);box-shadow:none}
+.role span:hover{transform:translateY(-3px);border-color:#a5b4fc}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+.st button.on{animation:bounce .35s}
+@keyframes bounce{0%{transform:scale(.7)}60%{transform:scale(1.22)}100%{transform:scale(1)}}
+#btnSpin:not(:disabled){animation:glow 1.8s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,.45)}50%{box-shadow:0 0 0 10px rgba(79,70,229,0)}}
+.tabpane{animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.login-card{animation:rise .5s ease}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.login-err,.form-err{color:var(--alpa);font-size:.85rem;margin:0;min-height:1em}
+.form-ok{color:var(--ok);font-size:.85rem;margin:0}
+
+/* role Mahasiswa: hanya lihat */
+body.role-mhs .only-sek,
+body.role-mhs .only-edit,
+body.role-mhs .tab[data-tab=mhs],
+body.role-mhs .tab[data-tab=riwayat],
+body.role-mhs .tab[data-tab=set]{display:none!important}
+body.role-mhs .st button{pointer-events:none}
+body.role-mhs .st button:not(.on){display:none}
+
+@media(max-width:520px){
+  .card{margin:10px;padding:13px}
+  .st button{width:34px}
+  .grid3{grid-template-columns:1fr 1fr}
+  .sgrp{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<section id="login" class="login-wrap">
+  <div class="login-card">
+    <div class="logo">🏛️</div>
+    <h1>CLASSORA</h1>
+    <p class="muted">Masuk sebagai siapa?</p>
+
+    <div class="role-pick">
+      <label class="role">
+        <input type="radio" name="role" value="Sekretaris" checked>
+        <span><b>Sekretaris</b><small>Akses penuh</small></span>
+      </label>
+      <label class="role">
+        <input type="radio" name="role" value="Mahasiswa">
+        <span><b>Mahasiswa</b><small>Hanya lihat</small></span>
+      </label>
+    </div>
+
+    <input id="loginName" type="text" placeholder="Nama kamu (opsional)">
+    <div id="codeWrap">
+      <input id="loginCode" type="password" placeholder="Kode Sekretaris" autocomplete="off">
+    </div>
+    <p id="loginErr" class="login-err"></p>
+    <button id="btnLogin" class="btn primary block">Masuk</button>
+    <p class="muted tiny">Data tersimpan di browser perangkat ini.</p>
+  </div>
+</section>
+
+<!-- ========== APLIKASI ========== -->
+<div id="app" class="hidden">
+  <header class="topbar">
+    <div>
+      <h2>🏛️ CLASSORA</h2>
+      <small id="whoami"></small>
+    </div>
+    <button id="btnLogout" class="btn ghost small">Keluar</button>
+  </header>
+
+  <section class="context card">
+    <div class="field">
+      <label for="date">Tanggal</label>
+      <input id="date" type="date">
+    </div>
+    <div class="field grow">
+      <label for="matkul">Mata Kuliah</label>
+      <input id="matkul" list="matkulList" type="text" placeholder="cth: Analisis Real">
+      <datalist id="matkulList"></datalist>
+    </div>
+    <div id="saveState" class="save-state">—</div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="absen">✅ Absen</button>
+    <button class="tab" data-tab="mhs">👥 Mahasiswa</button>
+    <button class="tab" data-tab="kelompok">🎡 Spin &amp; Kelompok</button>
+    <button class="tab" data-tab="jadwal">📅 Jadwal</button>
+    <button class="tab" data-tab="tugas">📝 Tugas</button>
+    <button class="tab" data-tab="riwayat">🗂️ Riwayat</button>
+    <button class="tab" data-tab="set">⚙️ Pengaturan</button>
+  </nav>
+
+  <!-- ===== TAB ABSEN ===== -->
+  <main id="tab-absen" class="tabpane">
+    <div class="card">
+      <div class="row between wrap">
+        <h3>Daftar Hadir</h3>
+        <div class="row gap wrap">
+          <button id="btnAllHadir" class="btn small only-edit">Semua Hadir</button>
+          <button id="btnResetAbsen" class="btn ghost small only-edit">Reset</button>
+        </div>
+      </div>
+      <div id="counter" class="counter"></div>
+      <div id="absenList" class="list"></div>
+      <div class="field">
+        <label for="note">Catatan (opsional)</label>
+        <input id="note" type="text" placeholder="cth: dosen memberi tugas kelompok">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>📎 Papan Klip (Rekap)</h3>
+        <button id="btnCopyRekap" class="btn primary small">Salin Semua</button>
+      </div>
+      <textarea id="rekap" rows="14" spellcheck="false"></textarea>
+      <p class="muted tiny">Rekap diperbarui otomatis. Kamu bebas mengedit teksnya sebelum disalin.</p>
+    </div>
+  </main>
+
+  <!-- ===== TAB MAHASISWA ===== -->
+  <main id="tab-mhs" class="tabpane hidden">
+    <div class="card">
+      <h3>Tambah Mahasiswa</h3>
+      <div class="row gap wrap">
+        <input id="mName" class="grow" type="text" placeholder="Nama">
+        <input id="mNim" type="text" placeholder="NIM (opsional)">
+        <button id="btnAddMhs" class="btn primary">Tambah</button>
+      </div>
+      <details>
+        <summary>Tambah banyak sekaligus</summary>
+        <textarea id="bulk" rows="6" placeholder="Satu baris satu orang.&#10;Format: Nama - NIM&#10;(NIM boleh dikosongkan)&#10;&#10;Contoh:&#10;Budi Santoso - 2023030001&#10;Siti Aminah"></textarea>
+        <button id="btnBulk" class="btn small">Tambahkan Semua</button>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>Daftar Kelas <span id="mCount" class="badge">0</span></h3>
+        <button id="btnClearMhs" class="btn danger small only-sek">Hapus Semua</button>
+      </div>
+      <div id="mhsList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB SPIN & KELOMPOK ===== -->
+  <main id="tab-kelompok" class="tabpane hidden">
+    <div class="card only-edit" id="spinCard">
+      <h3>🎡 Spin</h3>
+      <div class="role-pick mode-pick">
+        <label class="role">
+          <input type="radio" name="spinMode" value="auto" checked>
+          <span><b>⚡ Otomatis</b><small>Roda berputar, semua langsung dibagi kelompok</small></span>
+        </label>
+        <label class="role">
+          <input type="radio" name="spinMode" value="indiv">
+          <span><b>🎯 Individu</b><small>Spin satu per satu, untuk apa saja</small></span>
+        </label>
+      </div>
+
+      <div id="wSrcWrap" class="role-pick hidden">
+        <label class="role">
+          <input type="radio" name="wSrc" value="peserta" checked>
+          <span><b>👥 Nama peserta</b><small>Dari daftar di bawah</small></span>
+        </label>
+        <label class="role">
+          <input type="radio" name="wSrc" value="custom">
+          <span><b>✏️ Daftar sendiri</b><small>Topik, tugas, giliran, dll</small></span>
+        </label>
+      </div>
+
+      <div class="source-box" id="sourceBox">
+        <b>Sumber nama peserta</b>
+        <label class="check"><input id="usePTI" type="checkbox" checked> Ambil dari daftar PTI B (<span id="ptiCount">0</span> orang)</label>
+        <label class="check sub"><input id="onlyPresent" type="checkbox"> Hanya yang hadir</label>
+        <div class="field">
+          <label for="extraNames">Tambah nama lain (kelas gabungan / tamu). Satu baris satu orang, format: Nama - NIM (NIM opsional)</label>
+          <textarea id="extraNames" rows="4" placeholder="Contoh:&#10;Andi Pratama - 2023030111&#10;Rina Wulandari"></textarea>
+        </div>
+        <div id="poolInfo" class="pool-info"></div>
+      </div>
+
+      <div class="source-box hidden" id="customBox">
+        <div class="field">
+          <label for="wheelList">Isi roda. Satu baris satu item (contoh: topik presentasi, giliran maju, hadiah)</label>
+          <textarea id="wheelList" rows="6" placeholder="Contoh:&#10;Topik 1&#10;Topik 2&#10;Topik 3"></textarea>
+        </div>
+      </div>
+
+      <div id="wOptions" class="source-box hidden">
+        <label class="check"><input id="wNoRepeat" type="checkbox" checked> Hasil yang sudah keluar dihapus dari roda (tidak terulang)</label>
+        <label class="check" id="wAssignLbl"><input id="wAssign" type="checkbox"> Masukkan hasil spin ke kelompok</label>
+      </div>
+
+      <div class="field" id="gCountField">
+        <label for="gCount">Jumlah kelompok</label>
+        <input id="gCount" type="number" min="2" value="4">
+      </div>
+
+      <div class="wheel-wrap">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="680" height="680"></canvas>
+      </div>
+      <div id="wheelInfo" class="pool-info center"></div>
+      <div id="spinBox" class="spin-box">Tekan SPIN!</div>
+      <button id="btnSpin" class="btn primary block big">🎲 SPIN</button>
+
+      <div id="spinLogWrap" class="hidden">
+        <div class="row between wrap">
+          <b>Hasil spin</b>
+          <div class="row gap wrap">
+            <button id="btnCopyLog" class="btn small">Salin Hasil</button>
+            <button id="btnResetWheel" class="btn danger small">Reset Roda</button>
+          </div>
+        </div>
+        <ol id="spinLog" class="spin-log"></ol>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>Hasil Kelompok</h3>
+        <div class="row gap wrap">
+          <button id="btnAddGroup" class="btn small only-edit">➕ Tambah Kelompok</button>
+          <button id="btnSaveSet" class="btn small only-edit">💾 Simpan ke Mata Kuliah</button>
+          <button id="btnClearGroups" class="btn danger small only-edit">Kosongkan</button>
+          <button id="btnCopyGroups" class="btn primary small">Salin Semua</button>
+        </div>
+      </div>
+      <p class="muted tiny only-edit">Kelompok bisa dibuat dengan spin, atau manual lewat "➕ Tambah Kelompok" (tambah, keluarkan, dan pindahkan anggota langsung di kartu). Nama &amp; materi bisa diedit, otomatis tersimpan sesuai tanggal + mata kuliah. Tekan "Simpan ke Mata Kuliah" agar kelompok ini bisa dipakai lagi di pertemuan lain.</p>
+      <div id="groupsWrap" class="groups"></div>
+      <datalist id="availList"></datalist>
+    </div>
+
+    <div class="card">
+      <h3>📚 Kelompok Tersimpan <span id="setMatkul" class="badge"></span></h3>
+      <div id="setsList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB JADWAL ===== -->
+  <main id="tab-jadwal" class="tabpane hidden">
+    <div class="card only-edit">
+      <h3 id="jFormTitle">Tambah Jadwal</h3>
+      <div class="grid2">
+        <div class="field">
+          <label for="jHari">Hari</label>
+          <select id="jHari"></select>
+        </div>
+        <div class="field">
+          <label for="jMatkul">Mata Kuliah</label>
+          <input id="jMatkul" list="matkulList" type="text" placeholder="cth: Analisis Real">
+        </div>
+        <div class="field">
+          <label for="jMulai">Jam mulai</label>
+          <input id="jMulai" type="time">
+        </div>
+        <div class="field">
+          <label for="jSelesai">Jam selesai</label>
+          <input id="jSelesai" type="time">
+        </div>
+      </div>
+      <div class="field">
+        <label for="jDosen">Dosen pengampu</label>
+        <input id="jDosen" type="text" placeholder="cth: Nur Hasanah, M.Pd">
+      </div>
+      <div class="row gap wrap">
+        <button id="btnSaveJadwal" class="btn primary">Tambah Jadwal</button>
+        <button id="btnCancelJadwal" class="btn hidden">Batal Edit</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>📅 Jadwal Mingguan</h3>
+        <button id="btnCopyJadwal" class="btn small">Salin Jadwal</button>
+      </div>
+      <div id="jadwalList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB TUGAS ===== -->
+  <main id="tab-tugas" class="tabpane hidden">
+    <div class="card only-edit">
+      <h3 id="tFormTitle">Tambah Tugas</h3>
+      <div class="grid2">
+        <div class="field">
+          <label for="tMatkul">Mata Kuliah</label>
+          <input id="tMatkul" list="matkulList" type="text" placeholder="cth: Analisis Real">
+        </div>
+        <div class="field">
+          <label for="tDeadline">Batas pengumpulan (opsional)</label>
+          <input id="tDeadline" type="date">
+        </div>
+      </div>
+      <div class="field">
+        <label for="tJudul">Judul tugas</label>
+        <input id="tJudul" type="text" placeholder="cth: Artikel kajian pustaka">
+      </div>
+      <div class="field">
+        <label for="tDesc">Penjelasan tugas</label>
+        <textarea id="tDesc" rows="5" style="font-family:inherit;font-size:.95rem" placeholder="Jelaskan apa saja yang harus dikerjakan..."></textarea>
+      </div>
+      <div class="field">
+        <label for="tFiles">Gambar / video pendukung (opsional)</label>
+        <input id="tFiles" type="file" accept="image/*,video/*" multiple>
+      </div>
+      <div id="tPreview" class="pending"></div>
+      <div class="row gap wrap">
+        <button id="btnSaveTugas" class="btn primary">Tambah Tugas</button>
+        <button id="btnCancelTugas" class="btn hidden">Batal Edit</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>📝 Daftar Tugas <span id="tCount" class="badge">0</span></h3>
+        <div class="row gap wrap">
+          <select id="tFilter" style="width:auto"></select>
+          <label class="check" style="padding-bottom:0"><input id="tHideDone" type="checkbox"> Sembunyikan yang selesai</label>
+        </div>
+      </div>
+      <div id="tugasList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB RIWAYAT ===== -->
+  <main id="tab-riwayat" class="tabpane hidden">
+    <div class="card">
+      <div class="subtabs">
+        <button class="subtab active" data-h="absen">✅ Riwayat Absen</button>
+        <button class="subtab" data-h="kel">🎡 Riwayat Kelompok</button>
+      </div>
+      <div id="histAbsen" class="list"></div>
+      <div id="histKel" class="list hidden"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB PENGATURAN ===== -->
+  <main id="tab-set" class="tabpane hidden">
+    <div class="card">
+      <h3>🔑 Ganti Sandi Sekretaris</h3>
+      <div class="field">
+        <label for="codeOld">Sandi lama</label>
+        <input id="codeOld" type="password" autocomplete="off">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="codeNew">Sandi baru (min. 4 karakter)</label>
+          <input id="codeNew" type="password" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="codeNew2">Ulangi sandi baru</label>
+          <input id="codeNew2" type="password" autocomplete="off">
+        </div>
+      </div>
+      <p id="codeMsg" class="form-err"></p>
+      <button id="btnChangeCode" class="btn primary">Simpan Sandi Baru</button>
+      <p class="muted tiny">Sandi tersimpan di browser perangkat ini. Kalau web dibuka di perangkat atau browser lain, sandi di sana tetap sandi awal sampai diganti juga.</p>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="lightbox" class="hidden"><img alt=""></div>
+
+<script>
+/* ================= PENYIMPANAN ================= */
+const KEY = { st: 'absen_students', rec: 'absen_records', grp: 'absen_groups', ses: 'absen_session' };
+const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
+const save = (k, v) => {
+  try { localStorage.setItem(k, JSON.stringify(v)); }
+  catch (e) { alert('Gagal menyimpan: penyimpanan browser penuh atau diblokir.'); }
+};
+const DEFAULT_CODE = '11223344';
+const getCode = () => { try { return localStorage.getItem('absen_code') || DEFAULT_CODE; } catch { return DEFAULT_CODE; } };
+
+let students    = load(KEY.st, []);
+let records     = load(KEY.rec, {});
+let groupsStore = load(KEY.grp, {});
+let extraStore  = load('absen_extra', {});
+let setsStore   = load('absen_sets', {});      // { matkulKey: {matkul, sets:[{id,name,date,savedAt,groups}]} }
+let jadwal      = load('absen_jadwal', []);    // [{id,hari,matkul,mulai,selesai,dosen}]
+let tugas       = load('absen_tugas', []);     // [{id,matkul,judul,desc,deadline,done,files:[{id,name,type,size}],created}]
+let wcfg        = load('absen_wheel', { src: 'peserta', list: '', norepeat: true, assign: false });
+let session     = load(KEY.ses, null);
+if (session && session.role === 'GSH') { session = null; localStorage.removeItem(KEY.ses); }
+let status = {};
+let curGroups = [];
+let spinResults = [];
+let wheelAngle = 0, wheelBusy = false;
+
+const $  = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const mod = (a, m) => ((a % m) + m) % m;
+
+const STATUS = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
+const HARI = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+const isMhs = () => session && session.role === 'Mahasiswa';
+
+function todayStr() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 10);
+}
+function fmtDate(s) {
+  if (!s) return '-';
+  return new Date(s + 'T00:00:00').toLocaleDateString('id-ID',
+    { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+function fmtShort(s) {
+  if (!s) return '';
+  const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`;
+}
+const matkulKey = (m = $('#matkul').value) => m.trim().toLowerCase();
+const ctxKey = (date = $('#date').value, matkul = $('#matkul').value) =>
+  matkul.trim() ? `${date}|${matkul.trim().toLowerCase()}` : null;
+const goTab = name => document.querySelector(`.tab[data-tab=${name}]`).click();
+
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2000);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  toast('Tersalin ke papan klip ✓');
+}
+function setSaveState(msg, cls) {
+  const el = $('#saveState'); el.textContent = msg; el.className = 'save-state ' + (cls || '');
+}
+
+/* ================= INDEXEDDB (gambar & video tugas) ================= */
+let _db = null;
+function idbOpen() {
+  return new Promise((res, rej) => {
+    if (_db) return res(_db);
+    if (!window.indexedDB) return rej(new Error('IndexedDB tidak didukung'));
+    const r = indexedDB.open('absen_media', 1);
+    r.onupgradeneeded = () => { r.result.createObjectStore('files', { keyPath: 'id' }); };
+    r.onsuccess = () => { _db = r.result; res(_db); };
+    r.onerror = () => rej(r.error);
+  });
+}
+const idbTx = (mode, fn) => idbOpen().then(db => new Promise((res, rej) => {
+  const tx = db.transaction('files', mode);
+  const rq = fn(tx.objectStore('files'));
+  tx.oncomplete = () => res(rq && rq.result);
+  tx.onerror = () => rej(tx.error);
+  tx.onabort = () => rej(tx.error);
+}));
+const idbPut = rec => idbTx('readwrite', s => s.put(rec));
+const idbGet = id => idbTx('readonly', s => s.get(id));
+const idbDel = id => idbTx('readwrite', s => s.delete(id));
+
+const urlCache = {};
+async function hydrateMedia(root = document) {
+  for (const el of root.querySelectorAll('[data-mid]')) {
+    const id = el.dataset.mid;
+    try {
+      if (!urlCache[id]) {
+        const rec = await idbGet(id);
+        if (!rec) { el.replaceWith(Object.assign(document.createElement('div'), { className: 'pfile', textContent: 'File hilang' })); continue; }
+        urlCache[id] = URL.createObjectURL(rec.blob);
+      }
+      el.src = urlCache[id];
+    } catch (e) { el.replaceWith(Object.assign(document.createElement('div'), { className: 'pfile', textContent: 'Gagal dimuat' })); }
+  }
+}
+async function dropMedia(id) {
+  try { await idbDel(id); } catch {}
+  if (urlCache[id]) { URL.revokeObjectURL(urlCache[id]); delete urlCache[id]; }
+}
+
+/* ================= LOGIN ================= */
+function applySession() {
+  if (!session) { $('#login').classList.remove('hidden'); $('#app').classList.add('hidden'); return; }
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  document.body.classList.toggle('role-mhs', session.role === 'Mahasiswa');
+  $('#note').readOnly = isMhs();
+  if (isMhs()) goTab('absen');
+  $('#whoami').textContent = `${session.role}${session.name ? ' • ' + session.name : ''}`;
+  initApp();
+}
+function toggleCode() {
+  const role = document.querySelector('input[name=role]:checked').value;
+  $('#codeWrap').classList.toggle('hidden', role !== 'Sekretaris');
+  $('#loginErr').textContent = '';
+}
+$$('input[name=role]').forEach(r => r.onchange = toggleCode);
+toggleCode();
+
+function doLogin() {
+  const role = document.querySelector('input[name=role]:checked').value;
+  if (role === 'Sekretaris' && $('#loginCode').value.trim() !== getCode()) {
+    $('#loginErr').textContent = 'Kode Sekretaris salah.';
+    const c = document.querySelector('.login-card');
+    c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    return;
+  }
+  session = { role, name: $('#loginName').value.trim() };
+  $('#loginCode').value = '';
+  save(KEY.ses, session); applySession();
+}
+$('#btnLogin').onclick = doLogin;
+$('#loginCode').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+$('#btnLogout').onclick = () => { localStorage.removeItem(KEY.ses); session = null; applySession(); };
+
+/* ================= TAB ================= */
+$$('.tab').forEach(b => b.onclick = () => {
+  $$('.tab').forEach(x => x.classList.toggle('active', x === b));
+  $$('.tabpane').forEach(p => p.classList.add('hidden'));
+  $('#tab-' + b.dataset.tab).classList.remove('hidden');
+  const t = b.dataset.tab;
+  if (t === 'riwayat') renderHistory();
+  if (t === 'jadwal') renderJadwal();
+  if (t === 'tugas') renderTugas();
+  if (t === 'kelompok') { renderSets(); refreshWheel(); }
+});
+
+/* ================= KONTEKS (tanggal + matkul) ================= */
+function refreshMatkulList() {
+  const set = new Set();
+  Object.values(records).forEach(r => r.matkul && set.add(r.matkul));
+  Object.values(groupsStore).forEach(r => r.matkul && set.add(r.matkul));
+  Object.values(setsStore).forEach(r => r.matkul && set.add(r.matkul));
+  jadwal.forEach(j => j.matkul && set.add(j.matkul));
+  tugas.forEach(t => t.matkul && set.add(t.matkul));
+  $('#matkulList').innerHTML = [...set].map(m => `<option value="${esc(m)}">`).join('');
+}
+function loadContext() {
+  const key = ctxKey();
+  const rec = key && records[key];
+  status = rec ? { ...rec.status } : {};
+  $('#note').value = rec ? (rec.note || '') : '';
+  const g = key && groupsStore[key];
+  curGroups = g ? JSON.parse(JSON.stringify(g.groups)) : [];
+  const ex = key && extraStore[key];
+  $('#extraNames').value = ex ? ex.text : '';
+  $('#usePTI').checked = ex ? ex.pti : true;
+  $('#onlyPresent').checked = ex ? ex.only : false;
+  document.querySelector(`input[name=spinMode][value=${ex && ex.mode ? ex.mode : 'auto'}]`).checked = true;
+  spinResults = [];
+  syncSpinUI(); renderAbsen(); renderGroups(); renderSets(); renderSpinLog();
+  setSaveState(key ? (rec || g ? 'Data dimuat ✓' : 'Belum ada data') : (isMhs() ? 'Isi mata kuliah untuk melihat data' : 'Isi mata kuliah agar tersimpan'), key ? 'ok' : 'warn');
+}
+function openContext(date, matkul) {
+  $('#date').value = date; $('#matkul').value = matkul; loadContext();
+}
+$('#date').onchange = loadContext;
+$('#matkul').oninput = loadContext;
+
+/* ================= MAHASISWA ================= */
+function addStudent(name, nim) {
+  name = name.trim(); if (!name) return false;
+  students.push({ id: uid(), name, nim: (nim || '').trim() });
+  return true;
+}
+function saveStudents() { save(KEY.st, students); renderStudents(); renderAbsen(); }
+
+$('#btnAddMhs').onclick = () => {
+  if (addStudent($('#mName').value, $('#mNim').value)) {
+    $('#mName').value = ''; $('#mNim').value = ''; $('#mName').focus(); saveStudents();
+  }
+};
+$('#mName').onkeydown = e => { if (e.key === 'Enter') $('#btnAddMhs').click(); };
+$('#mNim').onkeydown  = e => { if (e.key === 'Enter') $('#btnAddMhs').click(); };
+
+$('#btnBulk').onclick = () => {
+  let n = 0;
+  $('#bulk').value.split('\n').forEach(line => {
+    const parts = line.split(/\s[-–,]\s|\t/);
+    if (addStudent(parts[0] || '', parts[1] || '')) n++;
+  });
+  $('#bulk').value = ''; saveStudents(); toast(`${n} mahasiswa ditambahkan`);
+};
+$('#btnClearMhs').onclick = () => {
+  if (confirm('Hapus SEMUA daftar mahasiswa? (riwayat absen tetap ada)')) { students = []; saveStudents(); }
+};
+function renderStudents() {
+  $('#mCount').textContent = students.length;
+  $('#mhsList').innerHTML = students.length ? students.map((s, i) => `
+    <div class="item">
+      <div><span class="nm">${i + 1}. ${esc(s.name)}</span>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
+      <div class="row gap">
+        <button class="btn small" data-edit="${s.id}">Edit</button>
+        <button class="btn small danger only-sek" data-del="${s.id}">Hapus</button>
+      </div>
+    </div>`).join('') : '<div class="empty">Belum ada mahasiswa. Tambahkan di atas.</div>';
+}
+$('#mhsList').onclick = e => {
+  const del = e.target.dataset.del, ed = e.target.dataset.edit;
+  if (del) { students = students.filter(s => s.id !== del); saveStudents(); }
+  if (ed) {
+    const s = students.find(x => x.id === ed);
+    const nm = prompt('Nama:', s.name); if (nm === null) return;
+    const nim = prompt('NIM (boleh kosong):', s.nim || ''); if (nim === null) return;
+    s.name = nm.trim() || s.name; s.nim = nim.trim(); saveStudents();
+  }
+};
+
+/* ================= ABSEN ================= */
+function renderAbsen() {
+  $('#absenList').innerHTML = students.length ? students.map((s, i) => `
+    <div class="item">
+      <div><span class="nm">${i + 1}. ${esc(s.name)}</span>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
+      <div class="st" data-id="${s.id}">
+        ${Object.keys(STATUS).map(k => `<button data-s="${k}" title="${STATUS[k]}" class="${status[s.id] === k ? 'on' : ''}">${k}</button>`).join('')}
+      </div>
+    </div>`).join('') : '<div class="empty">Tambahkan mahasiswa dulu di tab Mahasiswa.</div>';
+  updateCounter(); updateRekap(); updatePoolInfo();
+}
+$('#absenList').onclick = e => {
+  if (isMhs()) return;
+  const btn = e.target.closest('button[data-s]'); if (!btn) return;
+  const id = btn.parentElement.dataset.id, s = btn.dataset.s;
+  if (status[id] === s) delete status[id]; else status[id] = s;
+  renderAbsen(); autosaveAbsen();
+};
+$('#btnAllHadir').onclick = () => { students.forEach(s => status[s.id] = 'H'); renderAbsen(); autosaveAbsen(); };
+$('#btnResetAbsen').onclick = () => { if (confirm('Kosongkan semua status absen?')) { status = {}; renderAbsen(); autosaveAbsen(); } };
+$('#note').oninput = () => { updateRekap(); autosaveAbsen(); };
+
+function updateCounter() {
+  const c = { H: 0, I: 0, S: 0, A: 0 };
+  students.forEach(s => { if (status[s.id]) c[status[s.id]]++; });
+  const belum = students.length - Object.values(c).reduce((a, b) => a + b, 0);
+  $('#counter').innerHTML = Object.keys(c).map(k => `<span>${STATUS[k]}: <b>${c[k]}</b></span>`).join('') +
+    `<span>Belum: <b>${belum}</b></span>`;
+}
+function buildRekapFrom(d) {
+  const lines = ['ABSENSI PTI B', `Mata Kuliah : ${d.matkul || '-'}`, `Tanggal     : ${fmtDate(d.date)}`, ''];
+  const label = s => s.name + (s.nim ? ` (${s.nim})` : '');
+  Object.keys(STATUS).forEach(k => {
+    const list = students.filter(s => d.status[s.id] === k);
+    lines.push(`${STATUS[k].toUpperCase()} (${list.length})`);
+    if (list.length) list.forEach((s, i) => lines.push(`${i + 1}. ${label(s)}`)); else lines.push('-');
+    lines.push('');
+  });
+  const belum = students.filter(s => !d.status[s.id]);
+  if (belum.length) {
+    lines.push(`BELUM DIISI (${belum.length})`);
+    belum.forEach((s, i) => lines.push(`${i + 1}. ${label(s)}`)); lines.push('');
+  }
+  const note = (d.note || '').trim(); if (note) lines.push(`Catatan: ${note}`);
+  lines.push(`Total mahasiswa: ${students.length}`);
+  return lines.join('\n');
+}
+function updateRekap() {
+  $('#rekap').value = buildRekapFrom({ matkul: $('#matkul').value.trim(), date: $('#date').value, status, note: $('#note').value });
+}
+$('#btnCopyRekap').onclick = () => copyText($('#rekap').value);
+
+function autosaveAbsen() {
+  const key = ctxKey();
+  if (!key) { setSaveState('Isi mata kuliah agar tersimpan', 'warn'); return; }
+  records[key] = { date: $('#date').value, matkul: $('#matkul').value.trim(), status: { ...status }, note: $('#note').value };
+  save(KEY.rec, records); refreshMatkulList();
+  setSaveState('Tersimpan otomatis ✓', 'ok');
+}
+
+/* ================= RODA SPIN ================= */
+const WHEEL_COLORS = ['#4f46e5', '#9333ea', '#db2777', '#ea580c', '#16a34a', '#0891b2', '#ca8a04', '#2563eb', '#dc2626', '#0d9488'];
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const labelOf = s => s.name + (s.nim ? ` (${s.nim})` : '');
+const getMode = () => document.querySelector('input[name=spinMode]:checked').value;
+const wSrc = () => document.querySelector('input[name=wSrc]:checked').value;
+const assignOn = () => getMode() === 'indiv' && wSrc() === 'peserta' && $('#wAssign').checked;
+
+function parseExtra() {
+  return $('#extraNames').value.split('\n').map(l => {
+    const p = l.split(/\s[-–,]\s|\t/);
+    return { name: (p[0] || '').trim(), nim: (p[1] || '').trim() };
+  }).filter(x => x.name);
+}
+function getPool() {
+  let base = [];
+  if ($('#usePTI').checked) base = $('#onlyPresent').checked ? students.filter(s => status[s.id] === 'H') : [...students];
+  const seen = new Set(base.map(s => s.name.toLowerCase()));
+  parseExtra().forEach(x => {
+    if (!seen.has(x.name.toLowerCase())) { seen.add(x.name.toLowerCase()); base.push(x); }
+  });
+  return base;
+}
+function parseLines(t) { return t.split('\n').map(x => x.trim()).filter(Boolean); }
+
+// item di roda: [{name,label}]
+function wheelCandidates() {
+  if (getMode() === 'auto') return getPool().map(s => ({ name: s.name, label: labelOf(s) }));
+  let items = wSrc() === 'peserta'
+    ? getPool().map(s => ({ name: s.name, label: labelOf(s) }))
+    : parseLines($('#wheelList').value).map(t => ({ name: t, label: t }));
+  if (assignOn()) {
+    const used = new Set(curGroups.flatMap(g => g.members));
+    items = items.filter(x => !used.has(x.label));
+  }
+  if ($('#wNoRepeat').checked) {
+    const won = [...spinResults];
+    items = items.filter(x => { const i = won.indexOf(x.label); if (i > -1) { won.splice(i, 1); return false; } return true; });
+  }
+  return items;
+}
+
+function drawWheel(items, ang) {
+  const c = $('#wheel'), ctx = c.getContext('2d');
+  const W = c.width, cx = W / 2, cy = W / 2, R = W / 2 - 12, n = items.length;
+  ctx.clearRect(0, 0, W, W);
+  if (!n) {
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 2 * Math.PI); ctx.fillStyle = '#e5e7eb'; ctx.fill();
+    ctx.fillStyle = '#6b7280'; ctx.font = 'bold 34px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Roda kosong', cx, cy); return;
+  }
+  const seg = 2 * Math.PI / n;
+  for (let i = 0; i < n; i++) {
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, ang + i * seg, ang + (i + 1) * seg); ctx.closePath();
+    ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length]; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+  }
+  const fs = Math.min(30, R * 0.6 * seg * 0.7);
+  if (fs >= 9 || n === 1) {
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+    for (let i = 0; i < n; i++) {
+      let t = items[i].name; if (t.length > 20) t = t.slice(0, 19) + '…';
+      let f = n === 1 ? 30 : fs; ctx.font = `bold ${f}px system-ui,sans-serif`;
+      while (ctx.measureText(t).width > R - 80 && f > 9) { f--; ctx.font = `bold ${f}px system-ui,sans-serif`; }
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang + (i + 0.5) * seg);
+      ctx.fillText(t, R - 20, 0); ctx.restore();
+    }
+  }
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, 2 * Math.PI); ctx.lineWidth = 8; ctx.strokeStyle = '#111827'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, 36, 0, 2 * Math.PI); ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.lineWidth = 6; ctx.strokeStyle = '#111827'; ctx.stroke();
+  ctx.fillStyle = '#111827'; ctx.font = '30px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🎯', cx, cy + 2);
+}
+function refreshWheel() {
+  if (wheelBusy) return;
+  const items = wheelCandidates();
+  $('#wheelInfo').textContent = `Isi roda: ${items.length} item`;
+  drawWheel(items, wheelAngle);
+}
+function spinWheel(items, ms = 4200) {
+  return new Promise(resolve => {
+    const n = items.length, seg = 2 * Math.PI / n;
+    const idx = Math.floor(Math.random() * n);
+    const jitter = (Math.random() - 0.5) * 0.7 * seg;
+    const target = mod(-Math.PI / 2 - (idx + 0.5) * seg + jitter, 2 * Math.PI);
+    const delta = mod(target - mod(wheelAngle, 2 * Math.PI), 2 * Math.PI);
+    const start = wheelAngle, end = start + delta + 2 * Math.PI * (5 + Math.floor(Math.random() * 3));
+    const t0 = performance.now();
+    wheelBusy = true;
+    (function frame(t) {
+      const p = Math.min(1, (t - t0) / ms);
+      wheelAngle = start + (end - start) * (1 - Math.pow(1 - p, 4));
+      drawWheel(items, wheelAngle);
+      if (p < 1) requestAnimationFrame(frame); else { wheelBusy = false; resolve(idx); }
+    })(t0);
+  });
+}
+
+/* --- tampilan opsi spin --- */
+function syncSpinUI() {
+  const indiv = getMode() === 'indiv', custom = indiv && wSrc() === 'custom';
+  $('#wSrcWrap').classList.toggle('hidden', !indiv);
+  $('#sourceBox').classList.toggle('hidden', custom);
+  $('#customBox').classList.toggle('hidden', !custom);
+  $('#wOptions').classList.toggle('hidden', !indiv);
+  $('#wAssignLbl').classList.toggle('hidden', custom);
+  $('#gCountField').classList.toggle('hidden', indiv && !assignOn());
+  $('#spinLogWrap').classList.toggle('hidden', !indiv);
+  $('#btnSpin').textContent = indiv ? '🎯 SPIN RODA' : '🎲 SPIN & BAGI KELOMPOK';
+}
+function updatePoolInfo() {
+  $('#ptiCount').textContent = students.length;
+  $('#onlyPresent').disabled = !$('#usePTI').checked;
+  $('#poolInfo').textContent = `Total peserta: ${getPool().length} orang`;
+  refreshWheel();
+}
+function saveExtra() {
+  const key = ctxKey();
+  if (key) {
+    extraStore[key] = { text: $('#extraNames').value, pti: $('#usePTI').checked, only: $('#onlyPresent').checked, mode: getMode() };
+    save('absen_extra', extraStore);
+  }
+  syncSpinUI(); updatePoolInfo();
+}
+['#extraNames', '#usePTI', '#onlyPresent'].forEach(s => {
+  $(s).addEventListener('input', saveExtra);
+  $(s).addEventListener('change', saveExtra);
+});
+$$('input[name=spinMode]').forEach(r => r.addEventListener('change', saveExtra));
+
+function saveWheelCfg() {
+  wcfg = { src: wSrc(), list: $('#wheelList').value, norepeat: $('#wNoRepeat').checked, assign: $('#wAssign').checked };
+  save('absen_wheel', wcfg); syncSpinUI(); updatePoolInfo();
+}
+$$('input[name=wSrc]').forEach(r => r.addEventListener('change', saveWheelCfg));
+['#wNoRepeat', '#wAssign'].forEach(s => $(s).addEventListener('change', saveWheelCfg));
+$('#wheelList').addEventListener('input', saveWheelCfg);
+function restoreWheelCfg() {
+  document.querySelector(`input[name=wSrc][value=${wcfg.src || 'peserta'}]`).checked = true;
+  $('#wheelList').value = wcfg.list || '';
+  $('#wNoRepeat').checked = wcfg.norepeat !== false;
+  $('#wAssign').checked = !!wcfg.assign;
+}
+
+/* --- log hasil (mode individu) --- */
+function renderSpinLog() {
+  $('#spinLog').innerHTML = spinResults.length ? spinResults.map(r => `<li>${esc(r)}</li>`).join('') : '<li class="muted" style="list-style:none;margin-left:-22px">Belum ada hasil.</li>';
+}
+$('#btnCopyLog').onclick = () => {
+  if (!spinResults.length) return toast('Belum ada hasil');
+  copyText('HASIL SPIN\n' + spinResults.map((r, i) => `${i + 1}. ${r}`).join('\n'));
+};
+$('#btnResetWheel').onclick = () => {
+  if (spinResults.length && !confirm('Reset roda dan hapus daftar hasil spin?')) return;
+  spinResults = []; renderSpinLog(); $('#spinBox').textContent = 'Tekan SPIN!'; updatePoolInfo();
+};
+
+/* --- jalankan spin --- */
+function ensureGroups() {
+  if (curGroups.length) return true;
+  const total = getPool().length;
+  if (total < 2) { alert('Peserta kurang dari 2.'); return false; }
+  let n = parseInt($('#gCount').value) || 2;
+  n = Math.max(2, Math.min(n, total)); $('#gCount').value = n;
+  curGroups = Array.from({ length: n }, (_, i) => ({ name: `Kelompok ${i + 1}`, materi: '', members: [] }));
+  return true;
+}
+async function spinAuto() {
+  const items = wheelCandidates();
+  if (items.length < 2) { alert('Peserta kurang dari 2. Aktifkan daftar PTI B atau tambah nama lain.'); return; }
+  if (curGroups.some(g => g.members.length) &&
+      !confirm('Kelompok yang sudah ada (termasuk yang dibuat manual) akan diganti hasil spin baru. Nama & materi kelompok dipertahankan. Lanjutkan?')) return;
+  let n = parseInt($('#gCount').value) || 2;
+  n = Math.max(2, Math.min(n, items.length)); $('#gCount').value = n;
+  const box = $('#spinBox'), btn = $('#btnSpin');
+  btn.disabled = true; box.classList.add('spinning'); box.textContent = 'Memutar roda...';
+  const idx = await spinWheel(items, 3600);
+  box.classList.remove('spinning'); btn.disabled = false;
+  box.textContent = `🎉 Kelompok terbentuk! (roda berhenti di ${items[idx].name})`;
+  const old = curGroups;
+  const mixed = shuffle(getPool());
+  curGroups = Array.from({ length: n }, (_, i) => ({
+    name: (old[i] && old[i].name) || `Kelompok ${i + 1}`,
+    materi: (old[i] && old[i].materi) || '',
+    members: []
+  }));
+  mixed.forEach((s, i) => curGroups[i % n].members.push(labelOf(s)));
+  renderGroups(); saveGroups(true);
+}
+async function spinIndiv() {
+  const items = wheelCandidates();
+  if (!items.length) { toast('Roda kosong. Tambahkan item atau reset roda.'); return; }
+  if (assignOn() && !ensureGroups()) return;
+  const box = $('#spinBox'), btn = $('#btnSpin');
+  btn.disabled = true; box.classList.add('spinning'); box.textContent = 'Memutar roda...';
+  const idx = await spinWheel(items, 4200);
+  const pick = items[idx];
+  box.classList.remove('spinning'); btn.disabled = false;
+  spinResults.push(pick.label); renderSpinLog();
+  box.textContent = `🎯 ${pick.name}`;
+  if (assignOn()) {
+    const gi = curGroups.reduce((best, g, i) => g.members.length < curGroups[best].members.length ? i : best, 0);
+    curGroups[gi].members.push(pick.label);
+    box.textContent = `🎯 ${pick.name} → ${curGroups[gi].name}`;
+    renderGroups(); saveGroups(true);
+    const card = $('#groupsWrap').children[gi]; if (card) card.classList.add('flash');
+  }
+  updatePoolInfo();
+}
+$('#btnSpin').onclick = () => (getMode() === 'indiv' ? spinIndiv() : spinAuto());
+
+/* ================= KELOMPOK ================= */
+// semua orang yang bisa ditambahkan manual (daftar PTI B + nama tambahan), tanpa yang sudah masuk kelompok
+function allNames() {
+  const seen = new Set(), out = [];
+  [...students, ...parseExtra()].forEach(s => {
+    const l = labelOf(s).toLowerCase();
+    if (!seen.has(l)) { seen.add(l); out.push(s); }
+  });
+  return out;
+}
+function unassigned() {
+  const used = new Set(curGroups.flatMap(g => g.members.map(m => m.toLowerCase())));
+  return allNames().filter(s => !used.has(labelOf(s).toLowerCase()));
+}
+function renderGroups() {
+  const mhs = isMhs(), ro = mhs ? 'readonly' : '';
+  $('#availList').innerHTML = unassigned().map(s => `<option value="${esc(labelOf(s))}">`).join('');
+  $('#groupsWrap').innerHTML = curGroups.length ? curGroups.map((g, i) => `
+    <div class="gcard" style="animation-delay:${i * 60}ms">
+      <input class="gname" data-i="${i}" type="text" value="${esc(g.name)}" placeholder="Nama kelompok" ${ro}>
+      <input class="materi" data-i="${i}" type="text" value="${esc(g.materi)}" placeholder="Materi kelompok" ${ro}>
+      <div class="ghead"><span>${g.members.length} anggota</span>${mhs ? '' : `<button class="btn small danger" data-gact="delg" data-i="${i}">Hapus kelompok</button>`}</div>
+      ${g.members.length ? `<div>${g.members.map((m, mi) => `
+        <div class="mrow"><span class="mname">${mi + 1}. ${esc(m)}</span>${mhs ? '' : `
+          <select class="mv" data-i="${i}" data-m="${mi}" title="Pindahkan ke kelompok lain"><option value="">↔</option>${curGroups.map((x, xi) => xi === i ? '' : `<option value="${xi}">${esc(x.name)}</option>`).join('')}</select>
+          <button class="xbtn" data-gact="rm" data-i="${i}" data-m="${mi}" title="Keluarkan dari kelompok">×</button>`}</div>`).join('')}</div>`
+        : '<div class="muted tiny">Belum ada anggota.</div>'}
+      ${mhs ? '' : `<div class="addrow"><input class="addm" data-i="${i}" list="availList" type="text" placeholder="Tambah anggota (pilih / ketik nama)"><button class="btn small" data-gact="add" data-i="${i}">Tambah</button></div>`}
+    </div>`).join('') : '<div class="empty">Belum ada kelompok. Tekan SPIN atau "➕ Tambah Kelompok".</div>';
+}
+$('#groupsWrap').oninput = e => {
+  if (isMhs()) return;
+  const i = e.target.dataset.i; if (i === undefined) return;
+  if (e.target.classList.contains('gname')) { curGroups[i].name = e.target.value; saveGroups(true); }
+  else if (e.target.classList.contains('materi')) { curGroups[i].materi = e.target.value; saveGroups(true); }
+};
+
+/* --- kelompok manual (tanpa spin) --- */
+function afterGroupEdit(focusI) {
+  renderGroups(); saveGroups(true); updatePoolInfo();
+  if (focusI !== undefined) { const el = document.querySelector(`.addm[data-i="${focusI}"]`); if (el) el.focus(); }
+}
+function nextGroupName() {
+  const used = new Set(curGroups.map(g => g.name.trim().toLowerCase()));
+  let n = curGroups.length + 1;
+  while (used.has(`kelompok ${n}`)) n++;
+  return `Kelompok ${n}`;
+}
+function addMember(gi, text) {
+  text = (text || '').trim(); if (!text) return false;
+  const lower = text.toLowerCase(), pool = allNames();
+  const hit = pool.find(x => labelOf(x).toLowerCase() === lower) || pool.find(x => x.name.toLowerCase() === lower);
+  let label;
+  if (hit) label = labelOf(hit);
+  else {
+    const p = text.split(/\s[-–,]\s|\t/), nm = (p[0] || '').trim();
+    if (!nm) return false;
+    label = nm + (p[1] && p[1].trim() ? ` (${p[1].trim()})` : '');
+  }
+  const holder = curGroups.findIndex(g => g.members.some(m => m.toLowerCase() === label.toLowerCase()));
+  if (holder > -1) { toast(`${label} sudah ada di ${curGroups[holder].name}`); return false; }
+  curGroups[gi].members.push(label); return true;
+}
+$('#btnAddGroup').onclick = () => {
+  curGroups.push({ name: nextGroupName(), materi: '', members: [] });
+  renderGroups(); saveGroups(true);
+  const last = $('#groupsWrap').lastElementChild, inp = last && last.querySelector('.gname');
+  if (inp) { inp.focus(); inp.select(); }
+};
+$('#groupsWrap').onclick = e => {
+  if (isMhs()) return;
+  const b = e.target.closest('[data-gact]'); if (!b) return;
+  const i = +b.dataset.i, act = b.dataset.gact;
+  if (act === 'add') { const inp = b.parentElement.querySelector('.addm'); if (addMember(i, inp.value)) afterGroupEdit(i); }
+  if (act === 'rm') { curGroups[i].members.splice(+b.dataset.m, 1); afterGroupEdit(); }
+  if (act === 'delg') {
+    const g = curGroups[i];
+    if (g.members.length && !confirm(`Hapus "${g.name}" beserta ${g.members.length} anggotanya dari kelompok?`)) return;
+    curGroups.splice(i, 1); afterGroupEdit();
+  }
+};
+$('#groupsWrap').onkeydown = e => {
+  if (isMhs() || e.key !== 'Enter' || !e.target.classList.contains('addm')) return;
+  e.preventDefault();
+  const i = +e.target.dataset.i;
+  if (addMember(i, e.target.value)) afterGroupEdit(i);
+};
+$('#groupsWrap').onchange = e => {
+  if (isMhs() || !e.target.classList.contains('mv') || e.target.value === '') return;
+  const i = +e.target.dataset.i, m = +e.target.dataset.m, to = +e.target.value;
+  const [who] = curGroups[i].members.splice(m, 1);
+  curGroups[to].members.push(who); afterGroupEdit();
+};
+
+function saveGroups(silent) {
+  const key = ctxKey();
+  if (!key) { if (!silent) alert('Isi mata kuliah dulu.'); setSaveState('Isi mata kuliah agar tersimpan', 'warn'); return; }
+  if (!curGroups.length) {
+    if (groupsStore[key]) { delete groupsStore[key]; save(KEY.grp, groupsStore); }
+    return;
+  }
+  groupsStore[key] = { date: $('#date').value, matkul: $('#matkul').value.trim(), groups: JSON.parse(JSON.stringify(curGroups)) };
+  save(KEY.grp, groupsStore); refreshMatkulList();
+  setSaveState('Tersimpan otomatis ✓', 'ok');
+}
+$('#btnClearGroups').onclick = () => {
+  if (!curGroups.length) return toast('Belum ada kelompok');
+  if (!confirm('Kosongkan kelompok untuk tanggal & mata kuliah ini?')) return;
+  const key = ctxKey(); curGroups = [];
+  if (key && groupsStore[key]) { delete groupsStore[key]; save(KEY.grp, groupsStore); }
+  renderGroups(); updatePoolInfo();
+};
+function buildGroupsText(groups, date, matkul) {
+  const out = ['PEMBAGIAN KELOMPOK', `Mata Kuliah : ${matkul || '-'}`];
+  if (date) out.push(`Tanggal     : ${fmtDate(date)}`);
+  out.push('');
+  groups.forEach(g => {
+    out.push(`${g.name}${g.materi ? ' — Materi: ' + g.materi : ''}`);
+    g.members.forEach((m, i) => out.push(`${i + 1}. ${m}`));
+    out.push('');
+  });
+  return out.join('\n').trim();
+}
+$('#btnCopyGroups').onclick = () => {
+  if (!curGroups.length) return toast('Belum ada kelompok');
+  copyText(buildGroupsText(curGroups, $('#date').value, $('#matkul').value.trim()));
+};
+
+/* --- kelompok tersimpan per mata kuliah --- */
+$('#btnSaveSet').onclick = () => {
+  const mk = matkulKey();
+  if (!mk) return alert('Isi mata kuliah dulu.');
+  if (!curGroups.length) return toast('Belum ada kelompok untuk disimpan');
+  const def = 'Kelompok ' + fmtShort($('#date').value);
+  const name = prompt('Nama simpanan kelompok:', def); if (name === null) return;
+  const nm = name.trim() || def;
+  const entry = setsStore[mk] || (setsStore[mk] = { matkul: $('#matkul').value.trim(), sets: [] });
+  const snap = JSON.parse(JSON.stringify(curGroups));
+  const ex = entry.sets.find(s => s.name.toLowerCase() === nm.toLowerCase());
+  if (ex) {
+    if (!confirm(`"${nm}" sudah ada. Timpa dengan kelompok yang sekarang?`)) return;
+    ex.groups = snap; ex.date = $('#date').value; ex.savedAt = Date.now();
+  } else entry.sets.push({ id: uid(), name: nm, date: $('#date').value, savedAt: Date.now(), groups: snap });
+  save('absen_sets', setsStore); refreshMatkulList(); renderSets();
+  toast(`Kelompok disimpan di "${entry.matkul}" ✓`);
+};
+function renderSets() {
+  const mk = matkulKey(), box = $('#setsList');
+  $('#setMatkul').textContent = $('#matkul').value.trim();
+  $('#setMatkul').classList.toggle('hidden', !mk);
+  if (!mk) { box.innerHTML = '<div class="empty">Isi mata kuliah di atas untuk melihat kelompok tersimpan.</div>'; return; }
+  const entry = setsStore[mk];
+  if (!entry || !entry.sets.length) { box.innerHTML = '<div class="empty">Belum ada kelompok tersimpan untuk mata kuliah ini.</div>'; return; }
+  const ro = isMhs() ? 'readonly' : '';
+  box.innerHTML = entry.sets.slice().sort((a, b) => b.savedAt - a.savedAt).map(s => `
+    <div class="setbox" data-sid="${s.id}">
+      <div class="row between wrap gap">
+        <div><span class="nm">${esc(s.name)}</span>
+          <div class="nim">${s.groups.length} kelompok • disimpan ${new Date(s.savedAt).toLocaleDateString('id-ID')}</div></div>
+        <div class="row gap wrap">
+          <button class="btn small only-edit" data-act="load">Muat</button>
+          <button class="btn small" data-act="copy">Salin</button>
+          <button class="btn small danger only-edit" data-act="del">Hapus</button>
+        </div>
+      </div>
+      <details><summary>Lihat${isMhs() ? '' : ' / edit nama &amp; materi'}</summary>
+        ${s.groups.map((g, gi) => `
+          <div class="sgrp">
+            <input class="sgname" data-gi="${gi}" type="text" value="${esc(g.name)}" placeholder="Nama kelompok" ${ro}>
+            <input class="sgmateri" data-gi="${gi}" type="text" value="${esc(g.materi)}" placeholder="Materi kelompok" ${ro}>
+            <div class="smembers">${g.members.map(esc).join(', ') || '-'}</div>
+          </div>`).join('')}
+      </details>
+    </div>`).join('');
+}
+$('#setsList').oninput = e => {
+  if (isMhs()) return;
+  const box = e.target.closest('.setbox'); if (!box) return;
+  const entry = setsStore[matkulKey()]; if (!entry) return;
+  const s = entry.sets.find(x => x.id === box.dataset.sid); if (!s) return;
+  const gi = e.target.dataset.gi; if (gi === undefined) return;
+  if (e.target.classList.contains('sgname')) s.groups[gi].name = e.target.value;
+  if (e.target.classList.contains('sgmateri')) s.groups[gi].materi = e.target.value;
+  save('absen_sets', setsStore);
+};
+$('#setsList').onclick = e => {
+  const act = e.target.dataset.act; if (!act) return;
+  const box = e.target.closest('.setbox');
+  const entry = setsStore[matkulKey()]; if (!entry) return;
+  const s = entry.sets.find(x => x.id === box.dataset.sid); if (!s) return;
+  if (act === 'copy') copyText(buildGroupsText(s.groups, s.date, entry.matkul));
+  if (act === 'load') {
+    if (isMhs()) return;
+    if (curGroups.length && !confirm('Ganti kelompok yang sedang tampil dengan simpanan ini?')) return;
+    curGroups = JSON.parse(JSON.stringify(s.groups));
+    renderGroups(); saveGroups(true); updatePoolInfo(); toast(`"${s.name}" dimuat ✓`);
+  }
+  if (act === 'del') {
+    if (!confirm(`Hapus simpanan "${s.name}"?`)) return;
+    entry.sets = entry.sets.filter(x => x.id !== s.id);
+    if (!entry.sets.length) delete setsStore[matkulKey()];
+    save('absen_sets', setsStore); renderSets(); refreshMatkulList();
+  }
+};
+
+/* ================= JADWAL ================= */
+let editJadwalId = null;
+$('#jHari').innerHTML = HARI.map(h => `<option>${h}</option>`).join('');
+const todayHari = () => ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][new Date().getDay()];
+const jamText = j => j.mulai && j.selesai ? `${j.mulai} - ${j.selesai}` : (j.mulai || j.selesai || '-');
+
+function resetJadwalForm() {
+  editJadwalId = null;
+  $('#jMatkul').value = ''; $('#jMulai').value = ''; $('#jSelesai').value = ''; $('#jDosen').value = '';
+  $('#jFormTitle').textContent = 'Tambah Jadwal'; $('#btnSaveJadwal').textContent = 'Tambah Jadwal';
+  $('#btnCancelJadwal').classList.add('hidden');
+}
+$('#btnSaveJadwal').onclick = () => {
+  const matkul = $('#jMatkul').value.trim();
+  if (!matkul) { toast('Nama mata kuliah wajib diisi'); return; }
+  const data = { hari: $('#jHari').value, matkul, mulai: $('#jMulai').value, selesai: $('#jSelesai').value, dosen: $('#jDosen').value.trim() };
+  if (editJadwalId) { Object.assign(jadwal.find(j => j.id === editJadwalId) || {}, data); toast('Jadwal diperbarui ✓'); }
+  else { jadwal.push({ id: uid(), ...data }); toast('Jadwal ditambahkan ✓'); }
+  save('absen_jadwal', jadwal); resetJadwalForm(); renderJadwal(); refreshMatkulList();
+};
+$('#btnCancelJadwal').onclick = resetJadwalForm;
+function renderJadwal() {
+  const wrap = $('#jadwalList');
+  if (!jadwal.length) { wrap.innerHTML = '<div class="empty">Belum ada jadwal.</div>'; return; }
+  const today = todayHari();
+  wrap.innerHTML = HARI.map(h => {
+    const rows = jadwal.filter(j => j.hari === h).sort((a, b) => (a.mulai || '').localeCompare(b.mulai || ''));
+    if (!rows.length) return '';
+    return `<div class="day-block"><div class="day-h ${h === today ? 'today' : ''}">${h}${h === today ? ' • Hari ini' : ''}</div>` +
+      rows.map(j => `
+        <div class="item" data-jid="${j.id}">
+          <div><span class="nm">${esc(j.matkul)}</span>
+            <div class="nim">🕒 ${esc(jamText(j))} • 👨‍🏫 ${esc(j.dosen || '-')}</div></div>
+          <div class="row gap wrap">
+            <button class="btn small" data-jact="use">Pakai</button>
+            <button class="btn small only-edit" data-jact="edit">Edit</button>
+            <button class="btn small danger only-edit" data-jact="del">Hapus</button>
+          </div>
+        </div>`).join('') + '</div>';
+  }).join('');
+}
+$('#jadwalList').onclick = e => {
+  const act = e.target.dataset.jact; if (!act) return;
+  const id = e.target.closest('.item').dataset.jid;
+  const j = jadwal.find(x => x.id === id); if (!j) return;
+  if (act === 'use') { openContext($('#date').value, j.matkul); goTab('absen'); toast(`Mata kuliah: ${j.matkul}`); }
+  if (act === 'edit') {
+    editJadwalId = id;
+    $('#jHari').value = j.hari; $('#jMatkul').value = j.matkul; $('#jMulai').value = j.mulai || '';
+    $('#jSelesai').value = j.selesai || ''; $('#jDosen').value = j.dosen || '';
+    $('#jFormTitle').textContent = 'Edit Jadwal'; $('#btnSaveJadwal').textContent = 'Simpan Perubahan';
+    $('#btnCancelJadwal').classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (act === 'del' && confirm(`Hapus jadwal ${j.matkul} (${j.hari})?`)) {
+    jadwal = jadwal.filter(x => x.id !== id); save('absen_jadwal', jadwal);
+    if (editJadwalId === id) resetJadwalForm();
+    renderJadwal(); refreshMatkulList();
+  }
+};
+$('#btnCopyJadwal').onclick = () => {
+  if (!jadwal.length) return toast('Belum ada jadwal');
+  const out = ['JADWAL KULIAH PTI B', ''];
+  HARI.forEach(h => {
+    const rows = jadwal.filter(j => j.hari === h).sort((a, b) => (a.mulai || '').localeCompare(b.mulai || ''));
+    if (!rows.length) return;
+    out.push(h.toUpperCase());
+    rows.forEach((j, i) => out.push(`${i + 1}. ${j.matkul} | ${jamText(j)} | ${j.dosen || '-'}`));
+    out.push('');
+  });
+  copyText(out.join('\n').trim());
+};
+
+/* ================= TUGAS ================= */
+let tForm = { id: null, files: [], removed: [] };
+let previewUrls = [];
+
+function renderPending() {
+  previewUrls.forEach(u => URL.revokeObjectURL(u)); previewUrls = [];
+  $('#tPreview').innerHTML = tForm.files.map((f, i) => {
+    const isImg = (f.type || '').startsWith('image/');
+    let media;
+    if (f.file) {
+      const u = URL.createObjectURL(f.file); previewUrls.push(u);
+      media = isImg ? `<img src="${u}" alt="">` : `<video src="${u}" muted></video>`;
+    } else media = isImg ? `<img data-mid="${f.id}" alt="">` : `<video data-mid="${f.id}" muted></video>`;
+    return `<div class="pfile" title="${esc(f.name)}">${media}<button type="button" data-rm="${i}">×</button></div>`;
+  }).join('');
+  hydrateMedia($('#tPreview'));
+}
+$('#tFiles').onchange = e => {
+  for (const f of e.target.files) {
+    if (!/^(image|video)\//.test(f.type)) { toast(`"${f.name}" bukan gambar/video`); continue; }
+    if (f.size > 200 * 1024 * 1024) { toast(`"${f.name}" terlalu besar (maks 200 MB)`); continue; }
+    tForm.files.push({ name: f.name, type: f.type, size: f.size, file: f });
+  }
+  e.target.value = ''; renderPending();
+};
+$('#tPreview').onclick = e => {
+  const i = e.target.dataset.rm; if (i === undefined) return;
+  const f = tForm.files[i];
+  if (f && f.id) tForm.removed.push(f.id);
+  tForm.files.splice(i, 1); renderPending();
+};
+function resetTugasForm() {
+  tForm = { id: null, files: [], removed: [] };
+  $('#tMatkul').value = ''; $('#tDeadline').value = ''; $('#tJudul').value = ''; $('#tDesc').value = '';
+  $('#tFormTitle').textContent = 'Tambah Tugas'; $('#btnSaveTugas').textContent = 'Tambah Tugas';
+  $('#btnCancelTugas').classList.add('hidden'); renderPending();
+}
+$('#btnCancelTugas').onclick = resetTugasForm;
+$('#btnSaveTugas').onclick = async () => {
+  const judul = $('#tJudul').value.trim();
+  if (!judul) { toast('Judul tugas wajib diisi'); return; }
+  const btn = $('#btnSaveTugas'); btn.disabled = true;
+  const metas = [];
+  for (const f of tForm.files) {
+    if (f.file) {
+      const id = uid() + uid();
+      try { await idbPut({ id, name: f.name, type: f.type, blob: f.file }); metas.push({ id, name: f.name, type: f.type, size: f.size }); }
+      catch (err) { alert(`Gagal menyimpan file "${f.name}". Penyimpanan browser penuh atau tidak didukung.`); }
+    } else metas.push({ id: f.id, name: f.name, type: f.type, size: f.size });
+  }
+  for (const id of tForm.removed) await dropMedia(id);
+  const data = { matkul: $('#tMatkul').value.trim(), judul, desc: $('#tDesc').value.trim(), deadline: $('#tDeadline').value, files: metas };
+  if (tForm.id) { Object.assign(tugas.find(t => t.id === tForm.id) || {}, data); toast('Tugas diperbarui ✓'); }
+  else { tugas.push({ id: uid(), done: false, created: Date.now(), ...data }); toast('Tugas ditambahkan ✓'); }
+  save('absen_tugas', tugas); btn.disabled = false;
+  resetTugasForm(); renderTugas(); refreshMatkulList();
+};
+function deadlineChip(t) {
+  if (!t.deadline) return '';
+  const days = Math.round((new Date(t.deadline + 'T00:00:00') - new Date(todayStr() + 'T00:00:00')) / 86400000);
+  const tgl = fmtShort(t.deadline);
+  if (t.done) return `<span class="chip">⏰ ${tgl}</span>`;
+  if (days < 0) return `<span class="chip late">Terlewat ${-days} hari • ${tgl}</span>`;
+  if (days === 0) return `<span class="chip warn">Hari ini • ${tgl}</span>`;
+  if (days === 1) return `<span class="chip warn">Besok • ${tgl}</span>`;
+  return `<span class="chip ${days <= 3 ? 'warn' : ''}">${days} hari lagi • ${tgl}</span>`;
+}
+function renderTugas() {
+  const mats = [...new Set(tugas.map(t => t.matkul || '(Tanpa mata kuliah)'))].sort();
+  const cur = $('#tFilter').value || '';
+  $('#tFilter').innerHTML = '<option value="">Semua mata kuliah</option>' + mats.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+  $('#tFilter').value = mats.includes(cur) ? cur : '';
+  const f = $('#tFilter').value, hide = $('#tHideDone').checked;
+  let list = tugas.filter(t => (!f || (t.matkul || '(Tanpa mata kuliah)') === f) && !(hide && t.done));
+  list.sort((a, b) => (a.done - b.done) || ((a.deadline || '9999').localeCompare(b.deadline || '9999')) || (b.created - a.created));
+  $('#tCount').textContent = list.length;
+  $('#tugasList').innerHTML = list.length ? list.map(t => `
+    <div class="tcard ${t.done ? 'done' : ''}" data-tid="${t.id}">
+      <div class="row between wrap gap">
+        <h4>${esc(t.judul)}</h4>
+        <div class="row gap wrap">
+          ${t.matkul ? `<span class="chip">${esc(t.matkul)}</span>` : ''}
+          ${t.done ? '<span class="chip ok">✓ Selesai</span>' : ''}
+          ${deadlineChip(t)}
+        </div>
+      </div>
+      ${t.desc ? `<div class="tdesc">${esc(t.desc)}</div>` : '<div class="muted tiny">Tidak ada penjelasan.</div>'}
+      ${t.files && t.files.length ? `<div class="media-grid">${t.files.map(m =>
+        (m.type || '').startsWith('image/')
+          ? `<img data-mid="${m.id}" alt="${esc(m.name)}" title="${esc(m.name)}">`
+          : `<video data-mid="${m.id}" controls preload="metadata" title="${esc(m.name)}"></video>`).join('')}</div>` : ''}
+      <div class="row gap wrap only-edit">
+        <button class="btn small" data-tact="done">${t.done ? 'Tandai belum selesai' : 'Tandai selesai'}</button>
+        <button class="btn small" data-tact="edit">Edit</button>
+        <button class="btn small danger" data-tact="del">Hapus</button>
+      </div>
+    </div>`).join('') : '<div class="empty">Belum ada tugas.</div>';
+  hydrateMedia($('#tugasList'));
+}
+$('#tFilter').onchange = renderTugas;
+$('#tHideDone').onchange = renderTugas;
+$('#tugasList').onclick = async e => {
+  if (e.target.tagName === 'IMG' && e.target.dataset.mid) {
+    $('#lightbox img').src = e.target.src; $('#lightbox').classList.remove('hidden'); return;
+  }
+  const act = e.target.dataset.tact; if (!act) return;
+  const id = e.target.closest('.tcard').dataset.tid;
+  const t = tugas.find(x => x.id === id); if (!t) return;
+  if (act === 'done') { t.done = !t.done; save('absen_tugas', tugas); renderTugas(); }
+  if (act === 'edit') {
+    tForm = { id, files: (t.files || []).map(m => ({ ...m })), removed: [] };
+    $('#tMatkul').value = t.matkul || ''; $('#tDeadline').value = t.deadline || ''; $('#tJudul').value = t.judul; $('#tDesc').value = t.desc || '';
+    $('#tFormTitle').textContent = 'Edit Tugas'; $('#btnSaveTugas').textContent = 'Simpan Perubahan';
+    $('#btnCancelTugas').classList.remove('hidden'); renderPending(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (act === 'del' && confirm(`Hapus tugas "${t.judul}" beserta file-nya?`)) {
+    for (const m of (t.files || [])) await dropMedia(m.id);
+    tugas = tugas.filter(x => x.id !== id); save('absen_tugas', tugas);
+    if (tForm.id === id) resetTugasForm();
+    renderTugas(); refreshMatkulList();
+  }
+};
+$('#lightbox').onclick = () => $('#lightbox').classList.add('hidden');
+
+/* ================= RIWAYAT (absen & kelompok dipisah) ================= */
+$$('.subtab').forEach(b => b.onclick = () => {
+  $$('.subtab').forEach(x => x.classList.toggle('active', x === b));
+  $('#histAbsen').classList.toggle('hidden', b.dataset.h !== 'absen');
+  $('#histKel').classList.toggle('hidden', b.dataset.h !== 'kel');
+});
+function renderHistory() {
+  const ka = Object.keys(records).sort().reverse();
+  $('#histAbsen').innerHTML = ka.length ? ka.map(k => {
+    const r = records[k];
+    const c = { H: 0, I: 0, S: 0, A: 0 }; Object.values(r.status).forEach(v => c[v]++);
+    return `<div class="item">
+      <div><span class="nm">${esc(r.matkul)}</span>
+        <div class="nim">${fmtDate(r.date)}</div>
+        <div class="nim">Hadir ${c.H} • Izin ${c.I} • Sakit ${c.S} • Alpa ${c.A}</div></div>
+      <div class="row gap wrap">
+        <button class="btn small" data-hact="open-abs" data-k="${esc(k)}">Buka</button>
+        <button class="btn small" data-hact="copy-abs" data-k="${esc(k)}">Salin Absen</button>
+        <button class="btn small danger only-sek" data-hact="del-abs" data-k="${esc(k)}">Hapus</button>
+      </div></div>`;
+  }).join('') : '<div class="empty">Belum ada riwayat absen.</div>';
+
+  const kk = Object.keys(groupsStore).sort().reverse();
+  $('#histKel').innerHTML = kk.length ? kk.map(k => {
+    const g = groupsStore[k];
+    const names = g.groups.map(x => esc(x.name) + (x.materi ? ` (${esc(x.materi)})` : '')).join(' • ');
+    return `<div class="item">
+      <div><span class="nm">${esc(g.matkul)}</span>
+        <div class="nim">${fmtDate(g.date)}</div>
+        <div class="nim">${g.groups.length} kelompok: ${names}</div></div>
+      <div class="row gap wrap">
+        <button class="btn small" data-hact="open-kel" data-k="${esc(k)}">Buka</button>
+        <button class="btn small" data-hact="copy-kel" data-k="${esc(k)}">Salin Kelompok</button>
+        <button class="btn small danger only-sek" data-hact="del-kel" data-k="${esc(k)}">Hapus</button>
+      </div></div>`;
+  }).join('') : '<div class="empty">Belum ada riwayat kelompok.</div>';
+}
+$('#tab-riwayat').onclick = e => {
+  const act = e.target.dataset.hact; if (!act) return;
+  const k = e.target.dataset.k;
+  if (act === 'open-abs') { const r = records[k]; openContext(r.date, r.matkul); goTab('absen'); toast('Data absen dibuka'); }
+  if (act === 'open-kel') { const g = groupsStore[k]; openContext(g.date, g.matkul); goTab('kelompok'); toast('Data kelompok dibuka'); }
+  if (act === 'copy-abs') { const r = records[k]; copyText(buildRekapFrom(r)); }
+  if (act === 'copy-kel') { const g = groupsStore[k]; copyText(buildGroupsText(g.groups, g.date, g.matkul)); }
+  if (act === 'del-abs' && confirm('Hapus riwayat ABSEN untuk entri ini? (data kelompok tidak ikut terhapus)')) {
+    delete records[k]; save(KEY.rec, records); renderHistory(); loadContext(); refreshMatkulList();
+  }
+  if (act === 'del-kel' && confirm('Hapus riwayat KELOMPOK untuk entri ini? (data absen tidak ikut terhapus)')) {
+    delete groupsStore[k]; save(KEY.grp, groupsStore); renderHistory(); loadContext(); refreshMatkulList();
+  }
+};
+
+/* ================= PENGATURAN: GANTI SANDI ================= */
+$('#btnChangeCode').onclick = () => {
+  const o = $('#codeOld').value, n = $('#codeNew').value, n2 = $('#codeNew2').value, msg = $('#codeMsg');
+  msg.className = 'form-err';
+  if (o !== getCode()) { msg.textContent = 'Sandi lama salah.'; return; }
+  if (n.length < 4) { msg.textContent = 'Sandi baru minimal 4 karakter.'; return; }
+  if (n !== n2) { msg.textContent = 'Ulangi sandi baru tidak sama.'; return; }
+  if (n === o) { msg.textContent = 'Sandi baru harus berbeda dari sandi lama.'; return; }
+  try { localStorage.setItem('absen_code', n); }
+  catch { msg.textContent = 'Gagal menyimpan sandi (penyimpanan browser diblokir).'; return; }
+  $('#codeOld').value = ''; $('#codeNew').value = ''; $('#codeNew2').value = '';
+  msg.className = 'form-ok'; msg.textContent = 'Sandi berhasil diganti ✓';
+  toast('Sandi berhasil diganti ✓');
+};
+
+/* ================= INIT ================= */
+let inited = false;
+function initApp() {
+  if (!inited) { $('#date').value = todayStr(); restoreWheelCfg(); inited = true; }
+  renderStudents(); refreshMatkulList(); renderJadwal(); renderTugas(); loadContext();
+}
+applySession();
+</script>
+</body>
+</html>
